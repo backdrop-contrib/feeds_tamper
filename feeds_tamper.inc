@@ -149,6 +149,7 @@ function feeds_tamper_load_by_importer(FeedsImporter $importer, $disabled = FALS
     }
     foreach ($mapping['tampers'] as $tamper) {
       $tamper = (object) $tamper;
+      if ($disabled || !$tamper->disabled)
       $return[$mapping['source']][$tamper->id] = $tamper;
     }
   }
