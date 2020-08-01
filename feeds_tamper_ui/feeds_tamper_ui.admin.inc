@@ -246,7 +246,7 @@ function theme_feeds_tamper_ui_list_form($variables) {
           $this_row[] = $map[$i]['table'][$id]['#name'];
           // Operations to perform on a plugin instance. It's disabled, so make
           // it just text.
-          $this_row[] = strip_tags($map[$i]['table'][$id]['operations']);
+          $this_row[] = t('Disabled');
           // Enabled checkbox.
           $this_row[] = backdrop_render($map[$i]['table'][$id]['enabled']);
           // Add disabled class to differentiate.
