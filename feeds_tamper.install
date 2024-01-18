@@ -22,18 +22,21 @@ function feeds_tamper_update_1000() {
     ->execute()
     ->fetchAllAssoc('id');
 
-    $disabled = update_variable_get('default_feeds_tamper', array());
+    $default_feeds_tamper = update_variable_get('default_feeds_tamper', array());
+    $disabled = is_array($default_feeds_tamper) ? $default_feeds_tamper : array();
 
     foreach($feeds_tampers as $tamper) {
       $importer_config = config('feeds.feeds_importer.' . $tamper->importer);
       $mappings = $importer_config->get('config.processor.config.mappings');
       foreach ($mappings as $key => $mapping) {
-        if ($mapping['source'] == $tamper->source ) {
+        if (!empty($tamper->source) && $mapping['source'] == $tamper->source) {
           if (!isset($mapping['tampers'])) {
             $importer_config->set('config.processor.config.mappings.' . $key . '.tampers', array());
           }
           unset($tamper->importer);
           unset($tamper->source);
+          $tamper->settings = (!empty($tamper->settings)) ? unserialize($tamper->settings) : array();
+          $tamper->disabled = (!empty($disabled[$tamper->id])) ? 1 : 0;
           $importer_config->set('config.processor.config.mappings.' . $key . '.tampers.' . $tamper->id, $tamper);
           $importer_config->save();
         }
@@ -49,26 +52,5 @@ function feeds_tamper_update_1000() {
  * Put tampers into feeds_importer config files.
  */
 function feeds_tamper_update_1001() {
-  $old_config_names = config_get_names_with_prefix('feeds_tamper.');
-  foreach ($old_config_names as $old_config_name) {
-    $old_config = config($old_config_name);
-    $instances = $old_config->get('instances');
-    foreach ($instances as $instance) {
-      $importer_config = config('feeds.feeds_importer.' . $instance['importer']);
-      $mappings = $importer_config->get('config.processor.config.mappings');
-      foreach ($mappings as $key => $mapping) {
-        if ($mapping['source'] == $instance['source'] ) {
-          if (!isset($mapping['tampers'])) {
-            $importer_config->set('config.processor.config.mappings.' . $key . '.tampers', array());
-          }
-          unset($instance['importer']);
-          unset($instance['source']);
-          $importer_config->set('config.processor.config.mappings.' . $key . '.tampers.' . $instance['id'], (object) $instance);
-          $importer_config->save();
-        }
-      }
-    }
-
-    $old_config->delete();
-  }
+  // Functionality moved into feeds_tamper_update_1000().
 }
