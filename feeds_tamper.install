@@ -53,4 +53,5 @@ function feeds_tamper_update_1000() {
  */
 function feeds_tamper_update_1001() {
   // Functionality moved into feeds_tamper_update_1000().
+  // @see https://github.com/backdrop-contrib/feeds_tamper/issues/19
 }
